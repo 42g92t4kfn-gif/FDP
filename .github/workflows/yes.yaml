@@ -1,1 +1,44 @@
+name: Build DEB Package
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+      uses: actions/checkout@v4
+
+      - name: Prepare DEB structure
+        run: |
+          mkdir -p package/DEBIAN
+          mkdir -p package/Library/MobileSubstrate/DynamicLibraries
+
+          # Copy your tweak contents
+          cp -R Library/MobileSubstrate/DynamicLibraries/* \
+                package/Library/MobileSubstrate/DynamicLibraries/
+
+          # Create the control file
+          cat <<EOF > package/DEBIAN/control
+Package: your-tweak-name
+Version: 1.0
+Section: System
+Priority: optional
+Architecture: iphoneos-arm
+Maintainer: Your Name
+Description: Your tweak description
+EOF
+
+      - name: Set permissions
+        run: chmod -R 755 package/DEBIAN
+
+      - name: Build .deb file
+        run: dpkg-deb --build package your-tweak.deb
+
+      - name: Upload DEB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tweak-deb
+          path: your-tweak.deb
