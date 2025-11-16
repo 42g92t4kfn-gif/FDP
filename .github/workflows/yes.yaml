@@ -27,16 +27,17 @@ Package: my-tweak
 Version: 1.0
 Section: System
 Priority: optional
-Architecture: iphoneos-arm
+Architecture: arm64e
 Maintainer: Example Maintainer <maintainer@example.com>
 Description: A mobile substrate tweak
 EOF
+
 
       - name: Build DEB package
         uses: DevChall-by-SDCY-and-VXM/debian-buildpackage-template@v0.0.13
         with:
           distro: debian:latest
-          arch: amd64
+          arch: arm64e
           build_arguments: "-b"
           package_name: "my-tweak"
           package_version: "1.0"
