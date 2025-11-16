@@ -9,36 +9,43 @@ jobs:
 
     steps:
       - name: Checkout repository
-      uses: actions/checkout@v4
+        uses: actions/checkout@v4
 
-      - name: Prepare DEB structure
+      - name: Prepare Debian source directory
         run: |
-          mkdir -p package/DEBIAN
-          mkdir -p package/Library/MobileSubstrate/DynamicLibraries
+          # Create Debian-compliant layout
+          mkdir -p deb-src/DEBIAN
+          mkdir -p deb-src/Library/MobileSubstrate/DynamicLibraries/
 
-          # Copy your tweak contents
+          # Copy your tweak files into the Debian source tree
           cp -R Library/MobileSubstrate/DynamicLibraries/* \
-                package/Library/MobileSubstrate/DynamicLibraries/
+                deb-src/Library/MobileSubstrate/DynamicLibraries/
 
-          # Create the control file
-          cat <<EOF > package/DEBIAN/control
-Package: your-tweak-name
+          # Create Debian control file (required)
+          cat <<EOF > deb-src/DEBIAN/control
+Package: my-tweak
 Version: 1.0
 Section: System
 Priority: optional
 Architecture: iphoneos-arm
-Maintainer: Your Name
-Description: Your tweak description
+Maintainer: Example Maintainer <maintainer@example.com>
+Description: A mobile substrate tweak
 EOF
 
-      - name: Set permissions
-        run: chmod -R 755 package/DEBIAN
-
-      - name: Build .deb file
-        run: dpkg-deb --build package your-tweak.deb
+      - name: Build DEB package
+        uses: DevChall-by-SDCY-and-VXM/debian-buildpackage-template@v0.0.13
+        with:
+          distro: debian:latest
+          arch: amd64
+          build_arguments: "-b"
+          package_name: "my-tweak"
+          package_version: "1.0"
+          package_maintainer: "Example Maintainer <maintainer@example.com>"
+          package_class: "s"
+          package_generate_orig: "false"
 
       - name: Upload DEB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tweak-deb
-          path: your-tweak.deb
+          name: my-tweak-deb
+          path: ./build/*.deb
