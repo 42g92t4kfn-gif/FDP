@@ -1,22 +1,27 @@
-name: Extract and Upload TAR
+name: Extract and Commit TAR Contents
 
 on:
   workflow_dispatch:
 
 jobs:
-  extract:
+  extract-and-commit:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Extract "Click me once.tar"
         run: |
-          mkdir extracted
-          tar -xf "Click me once.tar" -C extracted
+          tar -xf "Click me once.tar"
 
-      - name: Upload extracted files as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: extracted-files
-          path: extracted/
+      - name: Commit extracted files to repository root
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          git commit -m "Extracted contents of 'Click me once.tar'" || echo "No changes to commit"
+          git push
