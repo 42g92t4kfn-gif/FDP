@@ -30,7 +30,6 @@ Priority: optional
 Architecture: arm64e
 Maintainer: Example Maintainer <maintainer@example.com>
 Description: A mobile substrate tweak
-EOF
 
 
       - name: Build DEB package
