@@ -11,8 +11,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.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 }}
-
+          token: ${{ secrets. GITHUB_TOKEN }}
       - name: Extract "Click me once.tar"
         run: |
           tar -xf "Click me once.tar"
