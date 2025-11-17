@@ -13,31 +13,30 @@ jobs:
 
       - name: Prepare Debian source directory
         run: |
-          # Create Debian-compliant layout
+          set -e
           mkdir -p deb-src/DEBIAN
-          mkdir -p deb-src/Library/MobileSubstrate/DynamicLibraries/
+          mkdir -p deb-src/Library/MobileSubstrate/DynamicLibraries
+          # copy files (if nothing to copy this will not fail)
+          if [ -d "Library/MobileSubstrate/DynamicLibraries" ]; then
+            cp -a Library/MobileSubstrate/DynamicLibraries/. deb-src/Library/MobileSubstrate/DynamicLibraries/ || true
+          fi
 
-          # Copy tweak files
-          cp -R Library/MobileSubstrate/DynamicLibraries/* deb-src/Library/MobileSubstrate/DynamicLibraries/
+          # write control file using printf to avoid heredoc YAML confusion
+          printf '%s\n' "Package: my-tweak" \
+                        "Version: 1.0" \
+                        "Section: System" \
+                        "Priority: optional" \
+                        "Architecture: arm64e" \
+                        "Maintainer: Example Maintainer <maintainer@example.com>" \
+                        "Description: A mobile substrate tweak" \
+            > deb-src/DEBIAN/control
 
-          # Create control file
-          cat << 'EOF' > deb-src/DEBIAN/control
-Package: my-tweak
-Version: 1.0
-Section: System
-Priority: optional
-Architecture: arm64e
-Maintainer: Example Maintainer <maintainer@example.com>
-Description: A mobile substrate tweak
-EOF
-
-          # Create postinst (Sileo compatible)
-          cat << 'EOF' > deb-src/DEBIAN/postinst
-#!/bin/bash
-uicache --all
-killall -9 SpringBoard 2>/dev/null || true
-EOF
-
+          # write postinst for Sileo compatibility
+          printf '%s\n' "#!/bin/sh" \
+                        "set -e" \
+                        "uicache --all || true" \
+                        "killall -9 SpringBoard 2>/dev/null || true" \
+            > deb-src/DEBIAN/postinst
           chmod 755 deb-src/DEBIAN/postinst
 
       - name: Build DEB package
