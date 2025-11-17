@@ -17,22 +17,28 @@ jobs:
           mkdir -p deb-src/DEBIAN
           mkdir -p deb-src/Library/MobileSubstrate/DynamicLibraries/
 
-          # Copy your tweak files into the Debian source tree
+          # Copy tweak files
           cp -R Library/MobileSubstrate/DynamicLibraries/* \
                 deb-src/Library/MobileSubstrate/DynamicLibraries/
 
-          # Create Debian control file (required)
+          # Create control file
           cat <<EOF > deb-src/DEBIAN/control
+Package: my-tweak
+Version: 1.0
+Section: System
+Priority: optional
+Architecture: arm64e
+Maintainer: Example Maintainer <maintainer@example.com>
+Description: A mobile substrate tweak
+EOF
 
-      - name: |
-         Package: my-tweak
-         Version: 1.0
-         Section: System
-         Priority: optional
-         Architecture: arm64e
-         Maintainer: Example Maintainer <maintainer@example.com>
-         Description: A mobile substrate tweak
-
+          # Create postinst (Sileo compatibility)
+          cat <<EOF > deb-src/DEBIAN/postinst
+#!/bin/bash
+uicache --all
+killall -9 SpringBoard 2>/dev/null || true
+EOF
+          chmod 755 deb-src/DEBIAN/postinst
 
       - name: Build DEB package
         uses: DevChall-by-SDCY-and-VXM/debian-buildpackage-template@v0.0.13
