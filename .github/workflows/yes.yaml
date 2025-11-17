@@ -23,13 +23,15 @@ jobs:
 
           # Create Debian control file (required)
           cat <<EOF > deb-src/DEBIAN/control
-Package: my-tweak
-Version: 1.0
-Section: System
-Priority: optional
-Architecture: arm64e
-Maintainer: Example Maintainer <maintainer@example.com>
-Description: A mobile substrate tweak
+
+      - name: |
+         Package: my-tweak
+         Version: 1.0
+         Section: System
+         Priority: optional
+         Architecture: arm64e
+         Maintainer: Example Maintainer <maintainer@example.com>
+         Description: A mobile substrate tweak
 
 
       - name: Build DEB package
