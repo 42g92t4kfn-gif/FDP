@@ -18,11 +18,10 @@ jobs:
           mkdir -p deb-src/Library/MobileSubstrate/DynamicLibraries/
 
           # Copy tweak files
-          cp -R Library/MobileSubstrate/DynamicLibraries/* \
-                deb-src/Library/MobileSubstrate/DynamicLibraries/
+          cp -R Library/MobileSubstrate/DynamicLibraries/* deb-src/Library/MobileSubstrate/DynamicLibraries/
 
           # Create control file
-          cat <<EOF > deb-src/DEBIAN/control
+          cat << 'EOF' > deb-src/DEBIAN/control
 Package: my-tweak
 Version: 1.0
 Section: System
@@ -32,12 +31,13 @@ Maintainer: Example Maintainer <maintainer@example.com>
 Description: A mobile substrate tweak
 EOF
 
-          # Create postinst (Sileo compatibility)
-          cat <<EOF > deb-src/DEBIAN/postinst
+          # Create postinst (Sileo compatible)
+          cat << 'EOF' > deb-src/DEBIAN/postinst
 #!/bin/bash
 uicache --all
 killall -9 SpringBoard 2>/dev/null || true
 EOF
+
           chmod 755 deb-src/DEBIAN/postinst
 
       - name: Build DEB package
@@ -56,4 +56,4 @@ EOF
         uses: actions/upload-artifact@v4
         with:
           name: my-tweak-deb
-          path: ./build/*.deb
+          path: build/*.deb
